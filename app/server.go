@@ -17,12 +17,12 @@ func main() {
 
 	//Uncomment this block to pass the first stage
 
-	l, err := net.Listen("tcp", "0.0.0.0:6379")
+	listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
-	connection, err := l.Accept()
+	connection, err := listener.Accept()
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
@@ -37,12 +37,19 @@ func main() {
 		}
 		input := buffer.String()
 		buffer.Reset()
-		parseInput(input)
+		parseInput(input, connection)
 	}
 }
 
-func parseInput(input string) {
+func parseInput(input string, connection net.Conn) {
 	fmt.Printf("Received %s", input)
+	if input == "PING" {
+		_, err := connection.Write(formatRESPString("PONG"))
+		if err != nil {
+			fmt.Println("Error sending data", err.Error())
+			os.Exit(1)
+		}
+	}
 }
 
 func formatRESPString(input string) []byte {

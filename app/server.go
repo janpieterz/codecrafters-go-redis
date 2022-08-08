@@ -21,18 +21,28 @@ func main() {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
-	connection, err := listener.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-	fmt.Println("Listening to input")
-	defer connection.Close()
 
 	eventLoop := NewQueue()
-	buffer := make([]byte, 256)
 
 	go ProcessEventLoop(eventLoop, &connection)
+
+	for {
+		connection, err := listener.Accept()
+		defer connection.Close()
+
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+		fmt.Println("Connected to new client, start listening")
+
+		go ListenToConnection(connection, eventLoop)
+		
+	}
+}
+
+func ListenToConnection(connection net.Conn, eventLoop *Queue) {
+	buffer := make([]byte, 256)
 
 	for {
 		receivedCount, err := connection.Read(buffer)

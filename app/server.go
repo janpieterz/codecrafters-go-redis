@@ -28,6 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Listening to input")
+	defer connection.Close()
 
 	for {
 		var buffer bytes.Buffer

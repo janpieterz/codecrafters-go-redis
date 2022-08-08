@@ -24,7 +24,7 @@ func main() {
 
 	eventLoop := NewQueue()
 
-	go ProcessEventLoop(eventLoop, &connection)
+	go ProcessEventLoop(eventLoop)
 
 	for {
 		connection, err := listener.Accept()
@@ -37,7 +37,7 @@ func main() {
 		fmt.Println("Connected to new client, start listening")
 
 		go ListenToConnection(connection, eventLoop)
-		
+
 	}
 }
 
@@ -61,26 +61,26 @@ func ListenToConnection(connection net.Conn, eventLoop *Queue) {
 		splits := strings.Split(input, "\r\n")
 		for _, split := range splits {
 			fmt.Println("Received '%s', adding to event loop", split)
-			eventLoop.Push(split)
+			eventLoop.Push(QueuedMessage{message: split, connection: connection})
 		}
 	}
 }
 
-func ProcessEventLoop(queue *Queue, connection *net.Conn) {
+func ProcessEventLoop(queue *Queue) {
 	for {
 		if queue.Length() > 0 {
 			nextItem := queue.Pop()
-			parseInput(nextItem, *connection)
+			parseInput(nextItem)
 		} else {
 			time.Sleep(1 * time.Millisecond)
 		}
 	}
 }
 
-func parseInput(input string, connection net.Conn) {
+func parseInput(input QueuedMessage) {
 	fmt.Printf("Processing %s \n", input)
-	if input == "ping" {
-		_, err := connection.Write(formatRESPString("PONG"))
+	if input.message == "ping" {
+		_, err := input.connection.Write(formatRESPString("PONG"))
 		if err != nil {
 			fmt.Println("Error sending data", err.Error())
 			os.Exit(1)

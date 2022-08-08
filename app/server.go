@@ -30,7 +30,10 @@ func main() {
 
 	for {
 		var buffer bytes.Buffer
-		_, err = io.Copy(&buffer, connection)
+		writtenBytes, err := io.Copy(&buffer, connection)
+		if writtenBytes == 0 {
+			continue
+		}
 		if err != nil {
 			fmt.Println("Error reading input", err.Error())
 			os.Exit(1)

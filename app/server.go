@@ -48,7 +48,7 @@ func main() {
 
 func parseInput(input string, connection net.Conn) {
 	fmt.Printf("Received %s", input)
-	if input == "PING" {
+	if input == "ping" {
 		_, err := connection.Write(formatRESPString("PONG"))
 		if err != nil {
 			fmt.Println("Error sending data", err.Error())

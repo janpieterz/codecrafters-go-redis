@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
+
 	// Uncomment this block to pass the first stage
 	// "net"
 	// "os"
@@ -40,7 +42,11 @@ func main() {
 			continue
 		}
 		input := string(buffer[:receivedCount])
-		parseInput(input, connection)
+		splits := strings.Split(input, "\r\n")
+		for _, split := range splits {
+			parseInput(split, connection)
+		}
+
 	}
 }
 

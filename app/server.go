@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	// Uncomment this block to pass the first stage
@@ -26,11 +28,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err = connection.Write(formatRESPString("PONG"))
-	if err != nil {
-		fmt.Println("Error writing to connection", err.Error())
-		os.Exit(1)
+	for {
+		var buffer bytes.Buffer
+		_, err = io.Copy(&buffer, connection)
+		if err != nil {
+			fmt.Println("Error reading input", err.Error())
+			os.Exit(1)
+		}
+		input := buffer.String()
+		buffer.Reset()
+		parseInput(input)
 	}
+}
+
+func parseInput(input string) {
+	fmt.Printf("Received %s", input)
 }
 
 func formatRESPString(input string) []byte {

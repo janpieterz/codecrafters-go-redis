@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -34,8 +35,12 @@ func main() {
 	for {
 		receivedCount, err := connection.Read(buffer)
 		if err != nil {
-			fmt.Println("Error reading input", err.Error())
-			os.Exit(1)
+			if err == io.EOF {
+				fmt.Println("Found EOF")
+			} else {
+				fmt.Println("Error reading input", err.Error())
+				os.Exit(1)
+			}
 		}
 		if receivedCount == 0 {
 			continue

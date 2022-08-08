@@ -1,23 +1,23 @@
 package main
 
-type Queue[T any] []T
+type Queue []string
 
-func (self *Queue[T]) Push(newQueueItem interface{}) {
+func (self *Queue) Push(newQueueItem string) {
 	*self = append(*self, newQueueItem)
 }
 
-func (self *Queue[T]) Length() int {
+func (self *Queue) Length() int {
 	return len(*self)
 }
 
-func (self *Queue[T]) Pop() T {
+func (self *Queue) Pop() string {
 	selfRef := *self
-	var element interface{}
+	var element string
 	length := selfRef.Length()
 	element, *self = selfRef[0], selfRef[1:length]
 	return element
 }
 
-func NewQueue[T any]() *Queue[T] {
-	return &Queue[T]{}
+func NewQueue[T any]() *Queue {
+	return &Queue{}
 }

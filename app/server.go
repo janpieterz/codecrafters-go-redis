@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("Listening to input")
 	defer connection.Close()
 
-	eventLoop := NewQueue[string]()
+	eventLoop := NewQueue()
 	buffer := make([]byte, 256)
 
 	go ProcessEventLoop(eventLoop, &connection)
@@ -56,7 +56,7 @@ func main() {
 	}
 }
 
-func ProcessEventLoop(queue *Queue[string], connection *net.Conn) {
+func ProcessEventLoop(queue *Queue, connection *net.Conn) {
 	for {
 		if queue.Length() > 0 {
 			nextItem := queue.Pop()

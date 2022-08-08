@@ -60,7 +60,7 @@ func ListenToConnection(connection net.Conn, eventLoop *Queue) {
 		input := string(buffer[:receivedCount])
 		splits := strings.Split(input, "\r\n")
 		for _, split := range splits {
-			fmt.Sprintf("Received '%s', adding to event loop", split)
+			fmt.Printf("Received '%s', adding to event loop \n", split)
 			eventLoop.Push(QueuedMessage{message: split, connection: connection})
 		}
 	}
@@ -78,7 +78,7 @@ func ProcessEventLoop(queue *Queue) {
 }
 
 func parseInput(input QueuedMessage) {
-	fmt.Sprintf("Processing %s \n", input)
+	fmt.Printf("Processing %s \n", input)
 	if input.message == "ping" {
 		_, err := input.connection.Write(formatRESPString("PONG"))
 		if err != nil {

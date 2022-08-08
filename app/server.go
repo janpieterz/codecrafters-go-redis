@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -31,17 +30,12 @@ func main() {
 	defer connection.Close()
 
 	for {
-		var buffer bytes.Buffer
-		writtenBytes, err := io.Copy(&buffer, connection)
-		if writtenBytes == 0 {
-			continue
-		}
+		bytes, err := io.ReadAll(connection)
 		if err != nil {
 			fmt.Println("Error reading input", err.Error())
 			os.Exit(1)
 		}
-		input := buffer.String()
-		buffer.Reset()
+		input := string(bytes)
 		parseInput(input, connection)
 	}
 }

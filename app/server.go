@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 	// Uncomment this block to pass the first stage
 	// "net"
 	// "os"
@@ -13,9 +14,7 @@ import (
 
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
-
-	//Uncomment this block to pass the first stage
+	fmt.Println("Starting Go-Redis")
 
 	listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
@@ -30,7 +29,10 @@ func main() {
 	fmt.Println("Listening to input")
 	defer connection.Close()
 
+	eventLoop := NewQueue[string]()
 	buffer := make([]byte, 256)
+
+	go ProcessEventLoop(eventLoop, &connection)
 
 	for {
 		receivedCount, err := connection.Read(buffer)
@@ -48,14 +50,25 @@ func main() {
 		input := string(buffer[:receivedCount])
 		splits := strings.Split(input, "\r\n")
 		for _, split := range splits {
-			parseInput(split, connection)
+			fmt.Println("Received '%s', adding to event loop", split)
+			eventLoop.Push(split)
 		}
+	}
+}
 
+func ProcessEventLoop(queue *Queue[string], connection *net.Conn) {
+	for {
+		if queue.Length() > 0 {
+			nextItem := queue.Pop()
+			parseInput(nextItem, *connection)
+		} else {
+			time.Sleep(1 * time.Millisecond)
+		}
 	}
 }
 
 func parseInput(input string, connection net.Conn) {
-	fmt.Printf("Received %s \n", input)
+	fmt.Printf("Processing %s \n", input)
 	if input == "ping" {
 		_, err := connection.Write(formatRESPString("PONG"))
 		if err != nil {

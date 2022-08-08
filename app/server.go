@@ -48,7 +48,7 @@ func ListenToConnection(connection net.Conn, eventLoop *Queue) {
 		receivedCount, err := connection.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Println("Found EOF")
+				continue
 			} else {
 				fmt.Println("Error reading input", err.Error())
 				os.Exit(1)

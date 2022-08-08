@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
 	// Uncomment this block to pass the first stage
@@ -29,13 +28,18 @@ func main() {
 	fmt.Println("Listening to input")
 	defer connection.Close()
 
+	buffer := make([]byte, 256)
+
 	for {
-		bytes, err := io.ReadAll(connection)
+		receivedCount, err := connection.Read(buffer)
 		if err != nil {
 			fmt.Println("Error reading input", err.Error())
 			os.Exit(1)
 		}
-		input := string(bytes)
+		if receivedCount == 0 {
+			continue
+		}
+		input := string(buffer[:receivedCount])
 		parseInput(input, connection)
 	}
 }

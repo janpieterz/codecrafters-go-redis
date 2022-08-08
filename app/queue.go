@@ -18,6 +18,6 @@ func (self *Queue) Pop() string {
 	return element
 }
 
-func NewQueue[T any]() *Queue {
+func NewQueue() *Queue {
 	return &Queue{}
 }

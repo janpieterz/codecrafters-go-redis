@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"net"
 	"os"
@@ -36,7 +35,5 @@ func main() {
 
 func formatRESPString(input string) []byte {
 	formattedString := "+" + input + "\r\n"
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, formattedString)
-	return buf.Bytes()
+	return []byte(formattedString)
 }

@@ -118,7 +118,8 @@ func ParseInput(message RedisMessage) {
 		break
 	case "get":
 		fmt.Println("Getting value")
-		GetValue(message.messages[1])
+		value := GetValue(message.messages[1])
+		SendMessage(value, message.connection)
 		break
 	}
 }

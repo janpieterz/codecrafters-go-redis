@@ -128,14 +128,16 @@ func ParseInput(message RedisMessage) {
 }
 
 func SetValue(parameters []string) {
-	var expirationTime time.Time
+	var expirationTime *time.Time
+	expirationTime = nil
 	if len(parameters) > 2 {
 		if parameters[2] == "px" {
 			input, error := strconv.Atoi(parameters[3])
 			if error != nil {
 				fmt.Printf("Could not parse input, error: %s \n", error.Error())
 			} else {
-				expirationTime = time.Now().Add(time.Duration(input * 1000))
+				expiration := time.Now().Add(time.Duration(input * 1000))
+				expirationTime = &expiration
 			}
 		}
 	}

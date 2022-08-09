@@ -104,15 +104,19 @@ func ParseInput(message RedisMessage) {
 
 	switch message.messages[0] {
 	case "echo":
+		fmt.Println("Sending back echo response")
 		SendMessage(message.messages[1], message.connection)
 		break
 	case "ping":
+		fmt.Println("Sending back PONG response")
 		SendMessage("PONG", message.connection)
 		break
 	case "set":
+		fmt.Println("Setting value")
 		SetValue(message.messages[1], message.messages[2])
 		break
 	case "get":
+		fmt.Println("Getting value")
 		GetValue(message.messages[1])
 		break
 	}

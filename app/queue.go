@@ -3,7 +3,8 @@ package main
 import "net"
 
 type RedisMessage struct {
-	messages   []string
+	messages []string
+
 	connection net.Conn
 }
 

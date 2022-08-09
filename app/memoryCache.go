@@ -27,5 +27,5 @@ func (self MemoryCache) Get(key string) string {
 
 		}
 	}
-	return "$-1\r\n"
+	return "nil"
 }

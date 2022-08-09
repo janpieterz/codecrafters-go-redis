@@ -152,8 +152,10 @@ func GetValue(key string) string {
 
 func SendMessage(message string, connection net.Conn) {
 	formattedMessage := message
-	if message != "$-1" {
+	if message != "nil" {
 		formattedMessage = formatRESPString(message)
+	} else {
+		formattedMessage = "$-1\r\n"
 	}
 	_, err := connection.Write([]byte(formattedMessage))
 	if err != nil {

@@ -12,7 +12,10 @@ import (
 	// "os"
 )
 
+var memoryCache map[string]string
+
 func main() {
+	memoryCache = make(map[string]string)
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Starting Go-Redis")
 
@@ -86,14 +89,14 @@ func ProcessEventLoop(queue *Queue) {
 	for {
 		if queue.Length() > 0 {
 			nextItem := queue.Pop()
-			parseInput(nextItem)
+			ParseInput(nextItem)
 		} else {
 			time.Sleep(1 * time.Millisecond)
 		}
 	}
 }
 
-func parseInput(message RedisMessage) {
+func ParseInput(message RedisMessage) {
 	fmt.Printf("Processing messages %s \n", message.messages)
 	if len(message.messages) < 1 {
 		fmt.Println("Something went wrong, no messages in input message")
@@ -105,6 +108,26 @@ func parseInput(message RedisMessage) {
 		break
 	case "ping":
 		SendMessage("PONG", message.connection)
+		break
+	case "set":
+		SetValue(message.messages[1], message.messages[2])
+		break
+	case "get":
+		GetValue(message.messages[1])
+		break
+	}
+}
+
+func SetValue(key string, value string) {
+	memoryCache[key] = value
+}
+
+func GetValue(key string) string {
+	value, valueExisted := memoryCache[key]
+	if valueExisted {
+		return value
+	} else {
+		return "UNKNOWN"
 	}
 }
 

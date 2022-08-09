@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type CacheItem struct {
 	value      string
@@ -17,6 +20,7 @@ func (self MemoryCache) Get(key string) string {
 	value, valueExisted := self[key]
 	if valueExisted {
 		if value.expiration != nil && value.expiration.Before(time.Now()) {
+			fmt.Println("Value existed but expiration is before now")
 			delete(self, key)
 		} else {
 			return value.value

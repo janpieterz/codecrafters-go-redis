@@ -136,7 +136,7 @@ func SetValue(parameters []string) {
 			if error != nil {
 				fmt.Printf("Could not parse input, error: %s \n", error.Error())
 			} else {
-				expiration := time.Now().Add(time.Duration(input * 1000))
+				expiration := time.Now().Add(time.Duration(input * 1_000_000))
 				expirationTime = &expiration
 			}
 		}

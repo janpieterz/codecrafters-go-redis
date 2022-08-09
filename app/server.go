@@ -114,6 +114,7 @@ func ParseInput(message RedisMessage) {
 	case "set":
 		fmt.Println("Setting value")
 		SetValue(message.messages[1], message.messages[2])
+		SendMessage("OK", message.connection)
 		break
 	case "get":
 		fmt.Println("Getting value")

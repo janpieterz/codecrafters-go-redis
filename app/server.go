@@ -151,14 +151,17 @@ func GetValue(key string) string {
 }
 
 func SendMessage(message string, connection net.Conn) {
-	_, err := connection.Write(formatRESPString(message))
+	formattedMessage := message
+	if message != "$-1" {
+		formattedMessage = formatRESPString(message)
+	}
+	_, err := connection.Write([]byte(formattedMessage))
 	if err != nil {
 		fmt.Println("Error sending data", err.Error())
 		os.Exit(1)
 	}
 }
 
-func formatRESPString(input string) []byte {
-	formattedString := "+" + input + "\r\n"
-	return []byte(formattedString)
+func formatRESPString(input string) string {
+	return "+" + input + "\r\n"
 }

@@ -68,9 +68,12 @@ func ListenToConnection(connection net.Conn, eventLoop *Queue) {
 		for _, split := range splits {
 			if len(split) >= 1 {
 				firstCharacter := split[0]
-				if firstCharacter == '*' || firstCharacter == '&' {
+				if firstCharacter == '*' || firstCharacter == '$' {
 					continue
 				}
+			}
+			if len(split) < 1 {
+				continue
 			}
 			messages = append(messages, split)
 			fmt.Printf("Received '%s', adding to event loop \n", split)

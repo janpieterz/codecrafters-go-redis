@@ -141,12 +141,8 @@ func SetValue(parameters []string) {
 }
 
 func GetValue(key string) string {
-	value, valueExisted := memoryCache[key]
-	if valueExisted {
-		return value
-	} else {
-		return "UNKNOWN"
-	}
+	value := memoryCache.Get(key)
+	return value
 }
 
 func SendMessage(message string, connection net.Conn) {

@@ -59,10 +59,23 @@ func ListenToConnection(connection net.Conn, eventLoop *Queue) {
 		}
 		input := string(buffer[:receivedCount])
 		splits := strings.Split(input, "\r\n")
-		for _, split := range splits {
-			fmt.Printf("Received '%s', adding to event loop \n", split)
-			eventLoop.Push(QueuedMessage{message: split, connection: connection})
+		if len(splits) < 1 {
+			continue
 		}
+
+		messages := make([]string, 0)
+
+		for _, split := range splits {
+			if len(split) >= 1 {
+				firstCharacter := split[0]
+				if firstCharacter == '*' || firstCharacter == '&' {
+					continue
+				}
+			}
+			messages = append(messages, split)
+			fmt.Printf("Received '%s', adding to event loop \n", split)
+		}
+		eventLoop.Push(RedisMessage{messages: messages, connection: connection})
 	}
 }
 
@@ -77,14 +90,26 @@ func ProcessEventLoop(queue *Queue) {
 	}
 }
 
-func parseInput(input QueuedMessage) {
-	fmt.Printf("Processing %s \n", input)
-	if input.message == "ping" {
-		_, err := input.connection.Write(formatRESPString("PONG"))
-		if err != nil {
-			fmt.Println("Error sending data", err.Error())
-			os.Exit(1)
-		}
+func parseInput(message RedisMessage) {
+	fmt.Printf("Processing messages %s \n", message.messages)
+	if len(message.messages) < 1 {
+		fmt.Println("Something went wrong, no messages in input message")
+	}
+
+	switch message.messages[0] {
+	case "echo":
+		SendMessage(message.messages[1], message.connection)
+		break
+	case "ping":
+		SendMessage("PONG", message.connection)
+	}
+}
+
+func SendMessage(message string, connection net.Conn) {
+	_, err := connection.Write(formatRESPString(message))
+	if err != nil {
+		fmt.Println("Error sending data", err.Error())
+		os.Exit(1)
 	}
 }
 

@@ -137,6 +137,7 @@ func SetValue(parameters []string) {
 			}
 		}
 	}
+	fmt.Printf("Setting key %s with value %s and expiration %d \n", parameters[0], parameters[1], expirationTime)
 	memoryCache.Push(parameters[0], parameters[1], expirationTime)
 }
 

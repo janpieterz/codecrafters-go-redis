@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	// Uncomment this block to pass the first stage
@@ -12,10 +13,10 @@ import (
 	// "os"
 )
 
-var memoryCache map[string]string
+var memoryCache MemoryCache
 
 func main() {
-	memoryCache = make(map[string]string)
+	memoryCache = make(MemoryCache)
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Starting Go-Redis")
 
@@ -113,7 +114,7 @@ func ParseInput(message RedisMessage) {
 		break
 	case "set":
 		fmt.Println("Setting value")
-		SetValue(message.messages[1], message.messages[2])
+		SetValue(message.messages[1:])
 		SendMessage("OK", message.connection)
 		break
 	case "get":
@@ -124,8 +125,19 @@ func ParseInput(message RedisMessage) {
 	}
 }
 
-func SetValue(key string, value string) {
-	memoryCache[key] = value
+func SetValue(parameters []string) {
+	var expirationTime time.Time
+	if len(parameters) > 2 {
+		if parameters[2] == "px" {
+			input, error := strconv.Atoi(parameters[3])
+			if error != nil {
+				fmt.Printf("Could not parse input, error: %s \n", error.Error())
+			} else {
+				expirationTime = time.Now().Add(time.Duration(input * 1000))
+			}
+		}
+	}
+	memoryCache.Push(parameters[0], parameters[1], expirationTime)
 }
 
 func GetValue(key string) string {

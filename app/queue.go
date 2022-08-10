@@ -1,11 +1,13 @@
 package main
 
-import "net"
+import (
+	uuid2 "github.com/google/uuid"
+)
 
 type RedisMessage struct {
 	messages []string
 
-	connection net.Conn
+	connectionId uuid2.UUID
 }
 
 type Queue []RedisMessage
@@ -24,8 +26,4 @@ func (self *Queue) Pop() RedisMessage {
 	length := selfRef.Length()
 	element, *self = selfRef[0], selfRef[1:length]
 	return element
-}
-
-func NewQueue() *Queue {
-	return &Queue{}
 }

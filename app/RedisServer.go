@@ -14,12 +14,11 @@ import (
 type RedisServer struct {
 	MemoryCache MemoryCache
 	Connections map[uuid2.UUID]net.Conn
-	EventLoop   *Queue
+	EventLoop   chan RedisMessage
 }
 
 func NewRedisServer() *RedisServer {
-	var queue Queue
-	server := RedisServer{make(map[string]CacheItem), make(map[uuid2.UUID]net.Conn), &queue}
+	server := RedisServer{make(map[string]CacheItem), make(map[uuid2.UUID]net.Conn), make(chan RedisMessage)}
 	return &server
 }
 
@@ -52,14 +51,8 @@ func (server *RedisServer) Listen(address string) {
 }
 
 func (server *RedisServer) ProcessEventLoop() {
-	for {
-		if server.EventLoop.Length() > 0 {
-			nextItem := server.EventLoop.Pop()
-			server.ParseInput(nextItem)
-		} else {
-			time.Sleep(1 * time.Millisecond)
-		}
-	}
+	nextMessage := <-server.EventLoop
+	server.ParseInput(nextMessage)
 }
 
 func (server *RedisServer) ListenToConnection(connectionId uuid2.UUID) {
@@ -107,7 +100,7 @@ func (server *RedisServer) ProcessMessage(message string, connectionId uuid2.UUI
 		messages = append(messages, split)
 		fmt.Printf("Received '%s', adding to event loop \n", split)
 	}
-	server.EventLoop.Push(RedisMessage{messages: messages, connectionId: connectionId})
+	server.EventLoop <- RedisMessage{messages: messages, connectionId: connectionId}
 }
 
 func (server *RedisServer) ParseInput(message RedisMessage) {

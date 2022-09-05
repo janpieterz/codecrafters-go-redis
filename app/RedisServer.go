@@ -51,8 +51,11 @@ func (server *RedisServer) Listen(address string) {
 }
 
 func (server *RedisServer) ProcessEventLoop() {
-	nextMessage := <-server.EventLoop
-	server.ParseInput(nextMessage)
+	for {
+		nextMessage := <-server.EventLoop
+		server.ParseInput(nextMessage)
+	}
+
 }
 
 func (server *RedisServer) ListenToConnection(connectionId uuid2.UUID) {

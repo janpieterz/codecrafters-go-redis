@@ -24,7 +24,7 @@ type RedisServer struct {
 }
 
 func NewRedisServer() *RedisServer {
-	server := RedisServer{make(map[string]CacheItem), make(map[uuid2.UUID]net.Conn), make(chan RedisMessage)}
+	server := RedisServer{MemoryCache: MemoryCache{cache: map[string]CacheItem{}}, Connections: make(map[uuid2.UUID]net.Conn), EventLoop: make(chan RedisMessage)}
 	return &server
 }
 
@@ -140,7 +140,7 @@ func (server *RedisServer) ParseInput(message RedisMessage) {
 		break
 	case "get":
 		fmt.Println("Getting value")
-		fmt.Println("Cache status:", server.MemoryCache)
+		fmt.Println("Cache status:", server.MemoryCache.cache)
 		value := server.GetValue(message.messages[1])
 		SendMessage(value, connection)
 		break

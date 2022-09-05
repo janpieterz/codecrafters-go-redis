@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+type RedisMessage struct {
+	messages []string
+
+	connectionId uuid2.UUID
+}
+
 type RedisServer struct {
 	MemoryCache MemoryCache
 	Connections map[uuid2.UUID]net.Conn
@@ -23,7 +29,7 @@ func NewRedisServer() *RedisServer {
 }
 
 func (server *RedisServer) Listen(address string) {
-	listener, err := net.Listen("tcp", "0.0.0.0:6379")
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
@@ -55,7 +61,6 @@ func (server *RedisServer) ProcessEventLoop() {
 		nextMessage := <-server.EventLoop
 		server.ParseInput(nextMessage)
 	}
-
 }
 
 func (server *RedisServer) ListenToConnection(connectionId uuid2.UUID) {

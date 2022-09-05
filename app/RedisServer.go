@@ -18,7 +18,8 @@ type RedisServer struct {
 }
 
 func NewRedisServer() *RedisServer {
-	server := RedisServer{}
+	var queue Queue
+	server := RedisServer{make(map[string]CacheItem), make(map[uuid2.UUID]net.Conn), &queue}
 	return &server
 }
 
